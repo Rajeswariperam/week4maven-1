@@ -1,31 +1,44 @@
-
 pipeline {
     agent any
-    tools{
-        maven 'MAVEN_HOME'
+    tools {
+        maven 'MAVEN_HOME'  // Make sure this matches your Jenkins Maven tool name
     }
     stages {
-        stage('git repo & clean') {
+        stage('Checkout & Clean') {
             steps {
-                //bat "rmdir  /s /q mavenjava"
-                bat "git clone https://github.com/Rajeswariperam/week4maven-1.git"
-                bat "mvn clean -f mavenjava"
+                cleanWs()  // Clean workspace before starting
+                git url: 'https://github.com/Rajeswariperam/week4maven-1.git'
             }
         }
-        stage('install') {
+        stage('Build') {
             steps {
-                bat "mvn install -f mavenjava" #project name#
+                dir('week4maven-1') {
+                    bat "mvn clean install"
+                }
             }
         }
-        stage('test') {
+        stage('Test') {
             steps {
-                bat "mvn test -f mavenjava"
+                dir('week4maven-1') {
+                    bat "mvn test"
+                }
             }
         }
-        stage('package') {
+        stage('Package') {
             steps {
-                bat "mvn package -f mavenjava"
+                dir('week4maven-1') {
+                    bat "mvn package"
+                }
             }
+        }
+    }
+    post {
+        success {
+            echo 'Build completed successfully!'
+            archiveArtifacts 'week4maven-1/target/*.jar'
+        }
+        failure {
+            echo 'Build failed!'
         }
     }
 }
