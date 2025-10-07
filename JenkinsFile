@@ -1,0 +1,35 @@
+pipeline {
+    agent any
+    tools {
+        maven 'MAVEN_HOME'  // Ensure this matches your Maven installation name in Jenkins
+    }
+    stages {
+        stage('Clone repo & clean') {
+            steps {
+                // Remove old folder if it exists (uncomment if needed)
+                // bat "rmdir /s /q week4Maven"
+                
+                // Clone your GitHub repository
+                bat 'git clone https://github.com/Rajeswariperam/week4Maven.git'
+                
+                // Clean the Maven project inside the cloned folder
+                bat 'mvn clean -f week4Maven/pom.xml'
+            }
+        }
+        stage('Install') {
+            steps {
+                bat 'mvn install -f week4Maven/pom.xml'
+            }
+        }
+        stage('Test') {
+            steps {
+                bat 'mvn test -f week4Maven/pom.xml'
+            }
+        }
+        stage('Package') {
+            steps {
+                bat 'mvn package -f week4Maven/pom.xml'
+            }
+        }
+    }
+}
